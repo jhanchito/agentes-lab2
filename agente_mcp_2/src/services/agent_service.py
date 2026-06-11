@@ -15,6 +15,9 @@ from src.utils.environment import (
     HISTORY_LIMIT,
     OPENAI_API_KEY,
     OPENAI_MODEL,
+    LANGSMITH_API_KEY,
+    LANGSMITH_PROJECT,
+    LANGSMITH_ENDPOINT,
 )
 from src.services.tools import LOCAL_TOOLS, get_all_tools
 from src.utils.logger import get_logger
@@ -22,7 +25,16 @@ from src.utils.logger import get_logger
 logger = get_logger(__name__)
 
 os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
-os.environ["LANGCHAIN_TRACING_V2"] = "false"
+
+if LANGSMITH_API_KEY:
+    os.environ["LANGSMITH_TRACING"] = "true"
+    os.environ["LANGSMITH_API_KEY"] = LANGSMITH_API_KEY
+    os.environ["LANGSMITH_PROJECT"] = LANGSMITH_PROJECT
+    os.environ["LANGSMITH_ENDPOINT"] = LANGSMITH_ENDPOINT
+    _langsmith_enabled = True
+else:
+    os.environ["LANGSMITH_TRACING"] = "false"
+    _langsmith_enabled = False
 
 
 #SYSTEM_PROMPT = (Path(__file__).parent / "system_prompt.txt").read_text(encoding="utf-8")
@@ -32,6 +44,11 @@ _agent = create_agent(
     model=f"openai:{OPENAI_MODEL}",
     tools=LOCAL_TOOLS,
     system_prompt=INSTRUCTIONS,
+)
+
+logger.info(
+    "LangSmith tracing %s",
+    f"ACTIVADO (proyecto: {LANGSMITH_PROJECT})" if _langsmith_enabled else "DESACTIVADO",
 )
 
 

@@ -11,3 +11,7 @@ QDRANT_API_KEY: str | None = config("QDRANT_API_KEY", default=None)
 QDRANT_COLLECTION_NAME: str = config("QDRANT_COLLECTION_NAME", default="documents")
 
 NEON_API_KEY: str | None = config("NEON_API_KEY", default=None)
+
+LANGSMITH_API_KEY: str | None = config("LANGSMITH_API_KEY", default=None)
+LANGSMITH_PROJECT: str = config("LANGSMITH_PROJECT", default="agente-mcp")
+LANGSMITH_ENDPOINT: str = config("LANGSMITH_ENDPOINT", default="https://api.smith.langchain.com")
