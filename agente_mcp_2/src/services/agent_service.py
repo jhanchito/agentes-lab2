@@ -9,6 +9,12 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from sqlalchemy.orm import Session
 
 from src.services.prompt import INSTRUCTIONS
+from src.services.guardrails import (
+    prompt_injection_guardrail,
+    pii_redactor_guardrail,
+    canary_leak_guardrail,
+    guarded_instructions,
+)
 from src.repositories.history_repository import HistoryRepository
 from src.repositories.models.history import History
 from src.utils.environment import (
@@ -43,7 +49,12 @@ else:
 _agent = create_agent(
     model=f"openai:{OPENAI_MODEL}",
     tools=LOCAL_TOOLS,
-    system_prompt=INSTRUCTIONS,
+    system_prompt=guarded_instructions,
+    middleware=[
+        prompt_injection_guardrail,
+        pii_redactor_guardrail,
+        canary_leak_guardrail,
+    ],
 )
 
 logger.info(
@@ -58,7 +69,12 @@ def init_agent(tools: list) -> None:
     _agent = create_agent(
         model=f"openai:{OPENAI_MODEL}",
         tools=tools,
-        system_prompt=INSTRUCTIONS,
+        system_prompt=guarded_instructions,
+        middleware=[
+            prompt_injection_guardrail,
+            pii_redactor_guardrail,
+            canary_leak_guardrail,
+        ],
     )
     logger.info("Agente reinicializado con %d tool(s): %s", len(tools), [t.name for t in tools])
 
